@@ -18,10 +18,7 @@ export function validator(additional: AnySchema[]) {
         'json-pointer',
         'relative-json-pointer',
         'regex'
-    ])
-        .addKeyword('kind')
-        .addKeyword('modifier')
-        .addSchema(additional)
+    ]).addSchema(additional)
 }
 
 

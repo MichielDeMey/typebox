@@ -1,4 +1,4 @@
-import { Type, ReadonlyModifier, OptionalModifier } from '@sinclair/typebox'
+import { Type, Modifier } from '@sinclair/typebox'
 import * as assert from 'assert'
 
 describe('Modifier', () => {
@@ -12,11 +12,11 @@ describe('Modifier', () => {
         const P = JSON.parse(S) as any
 
         // check assignment on Type
-        assert.equal(T.properties.a['modifier'], ReadonlyModifier)
-        assert.equal(T.properties.b['modifier'], OptionalModifier)
+        assert.equal(T.properties.a[Modifier], 'ReadonlyModifier')
+        assert.equal(T.properties.b[Modifier], 'OptionalModifier')
 
         // check deserialized
-        assert.equal(P.properties.a['modifier'], undefined)
-        assert.equal(P.properties.b['modifier'], undefined)
+        assert.equal(P.properties.a[Modifier], undefined)
+        assert.equal(P.properties.b[Modifier], undefined)
     })
 })

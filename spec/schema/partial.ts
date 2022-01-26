@@ -1,9 +1,8 @@
-import { OptionalModifier, ReadonlyOptionalModifier, Type } from '@sinclair/typebox'
+import { Type, Modifier } from '@sinclair/typebox'
 import { ok, fail } from './validate'
 import { strictEqual } from 'assert'
 
 describe('Partial', () => {
-
     it('Should convert a required object into a partial.', () => {
         const A = Type.Object({
             x: Type.Number(),
@@ -25,10 +24,10 @@ describe('Partial', () => {
             w: Type.Number()
         }, { additionalProperties: false })
         const T = Type.Partial(A)
-        strictEqual(T.properties.x.modifier, ReadonlyOptionalModifier)
-        strictEqual(T.properties.y.modifier, ReadonlyOptionalModifier)
-        strictEqual(T.properties.z.modifier, OptionalModifier)
-        strictEqual(T.properties.w.modifier, OptionalModifier)
+        strictEqual(T.properties.x[Modifier], 'ReadonlyOptionalModifier')
+        strictEqual(T.properties.y[Modifier], 'ReadonlyOptionalModifier')
+        strictEqual(T.properties.z[Modifier], 'OptionalModifier')
+        strictEqual(T.properties.w[Modifier], 'OptionalModifier')
     })
 
     it('Should inherit options from the source object', () => {

@@ -1,34 +1,15 @@
-export declare const ReadonlyOptionalModifier: unique symbol;
-export declare const OptionalModifier: unique symbol;
-export declare const ReadonlyModifier: unique symbol;
+export declare const Kind: unique symbol;
+export declare const Modifier: unique symbol;
 export declare type TModifier = TReadonlyOptional<TSchema> | TOptional<TSchema> | TReadonly<TSchema>;
 export declare type TReadonlyOptional<T extends TSchema> = T & {
-    modifier: typeof ReadonlyOptionalModifier;
+    [Modifier]: 'ReadonlyOptionalModifier';
 };
 export declare type TOptional<T extends TSchema> = T & {
-    modifier: typeof OptionalModifier;
+    [Modifier]: 'OptionalModifier';
 };
 export declare type TReadonly<T extends TSchema> = T & {
-    modifier: typeof ReadonlyModifier;
+    [Modifier]: 'ReadonlyModifier';
 };
-export declare const NamespaceKind: unique symbol;
-export declare const KeyOfKind: unique symbol;
-export declare const IntersectKind: unique symbol;
-export declare const UnionKind: unique symbol;
-export declare const TupleKind: unique symbol;
-export declare const ObjectKind: unique symbol;
-export declare const RecordKind: unique symbol;
-export declare const ArrayKind: unique symbol;
-export declare const EnumKind: unique symbol;
-export declare const LiteralKind: unique symbol;
-export declare const StringKind: unique symbol;
-export declare const NumberKind: unique symbol;
-export declare const IntegerKind: unique symbol;
-export declare const BooleanKind: unique symbol;
-export declare const NullKind: unique symbol;
-export declare const UnknownKind: unique symbol;
-export declare const AnyKind: unique symbol;
-export declare const RefKind: unique symbol;
 export interface CustomOptions {
     $id?: string;
     title?: string;
@@ -68,7 +49,7 @@ export declare type TDefinitions = {
     [key: string]: TSchema;
 };
 export declare type TNamespace<T extends TDefinitions> = {
-    kind: typeof NamespaceKind;
+    [Kind]: 'NamespaceKind';
     $defs: T;
 } & CustomOptions;
 export interface TSchema {
@@ -87,7 +68,7 @@ export interface TProperties {
 }
 export interface TRecord<K extends TRecordKey, T extends TSchema> extends TSchema, ObjectOptions {
     $static: StaticRecord<K, T>;
-    kind: typeof RecordKind;
+    [Kind]: 'RecordKind';
     type: 'object';
     patternProperties: {
         [pattern: string]: T;
@@ -95,7 +76,7 @@ export interface TRecord<K extends TRecordKey, T extends TSchema> extends TSchem
 }
 export interface TTuple<T extends TSchema[]> extends TSchema, CustomOptions {
     $static: StaticTuple<T>;
-    kind: typeof TupleKind;
+    [Kind]: 'TupleKind';
     type: 'array';
     items?: T;
     additionalItems?: false;
@@ -104,115 +85,110 @@ export interface TTuple<T extends TSchema[]> extends TSchema, CustomOptions {
 }
 export interface TObject<T extends TProperties> extends TSchema, ObjectOptions {
     $static: StaticObject<T>;
-    kind: typeof ObjectKind;
+    [Kind]: 'ObjectKind';
     type: 'object';
     properties: T;
     required?: string[];
 }
 export interface TUnion<T extends TSchema[]> extends TSchema, CustomOptions {
     $static: StaticUnion<T>;
-    kind: typeof UnionKind;
+    [Kind]: 'UnionKind';
     anyOf: T;
 }
 export interface TIntersect<T extends TSchema[]> extends TSchema, IntersectOptions {
     $static: StaticIntersect<T>;
-    kind: typeof IntersectKind;
+    [Kind]: 'IntersectKind';
     type: 'object';
     allOf: T;
 }
 export interface TKeyOf<T extends TKey[]> extends TSchema, CustomOptions {
     $static: StaticKeyOf<T>;
-    kind: typeof KeyOfKind;
+    [Kind]: 'KeyOfKind';
     type: 'string';
     enum: T;
 }
 export interface TArray<T extends TSchema> extends TSchema, ArrayOptions {
     $static: StaticArray<T>;
-    kind: typeof ArrayKind;
+    [Kind]: 'ArrayKind';
     type: 'array';
     items: T;
 }
 export interface TLiteral<T extends TValue> extends TSchema, CustomOptions {
     $static: StaticLiteral<T>;
-    kind: typeof LiteralKind;
+    [Kind]: 'LiteralKind';
     const: T;
 }
 export interface TEnum<T extends TEnumKey[]> extends TSchema, CustomOptions {
     $static: StaticEnum<T>;
-    kind: typeof EnumKind;
+    [Kind]: 'EnumKind';
     anyOf: T;
 }
 export interface TRef<T extends TSchema> extends TSchema, CustomOptions {
     $static: Static<T>;
-    kind: typeof RefKind;
+    [Kind]: 'RefKind';
     $ref: string;
 }
 export interface TString extends TSchema, StringOptions<string> {
     $static: string;
-    kind: typeof StringKind;
+    [Kind]: 'StringKind';
     type: 'string';
 }
 export interface TNumber extends TSchema, NumberOptions {
     $static: number;
-    kind: typeof NumberKind;
+    [Kind]: 'NumberKind';
     type: 'number';
 }
 export interface TInteger extends TSchema, NumberOptions {
     $static: number;
-    kind: typeof IntegerKind;
+    [Kind]: 'IntegerKind';
     type: 'integer';
 }
 export interface TBoolean extends TSchema, CustomOptions {
     $static: boolean;
-    kind: typeof BooleanKind;
+    [Kind]: 'BooleanKind';
     type: 'boolean';
 }
 export interface TNull extends TSchema, CustomOptions {
     $static: null;
-    kind: typeof NullKind;
+    [Kind]: 'NullKind';
     type: 'null';
 }
 export interface TUnknown extends TSchema, CustomOptions {
     $static: unknown;
-    kind: typeof UnknownKind;
+    [Kind]: 'UnknownKind';
 }
 export interface TAny extends TSchema, CustomOptions {
     $static: any;
-    kind: typeof AnyKind;
+    [Kind]: 'AnyKind';
 }
-export declare const ConstructorKind: unique symbol;
-export declare const FunctionKind: unique symbol;
-export declare const PromiseKind: unique symbol;
-export declare const UndefinedKind: unique symbol;
-export declare const VoidKind: unique symbol;
 export interface TConstructor<T extends TSchema[], U extends TSchema> extends TSchema, CustomOptions {
     $static: StaticConstructor<T, U>;
-    kind: typeof ConstructorKind;
+    [Kind]: 'ConstructorKind';
     type: 'constructor';
     arguments: TSchema[];
     returns: TSchema;
 }
 export interface TFunction<T extends TSchema[], U extends TSchema> extends TSchema, CustomOptions {
     $static: StaticFunction<T, U>;
-    kind: typeof FunctionKind;
+    [Kind]: 'FunctionKind';
     type: 'function';
     arguments: TSchema[];
     returns: TSchema;
 }
 export interface TPromise<T extends TSchema> extends TSchema, CustomOptions {
     $static: StaticPromise<T>;
-    kind: typeof PromiseKind;
+    [Kind]: 'PromiseKind';
     type: 'promise';
     item: TSchema;
 }
 export interface TUndefined extends TSchema, CustomOptions {
     $static: undefined;
-    kind: typeof UndefinedKind;
+    [Kind]: 'UndefinedKind';
     type: 'undefined';
 }
 export interface TVoid extends TSchema, CustomOptions {
     $static: void;
-    kind: typeof VoidKind;
+    [Kind]: 'VoidKind';
     type: 'void';
 }
 export declare type Selectable = TObject<TProperties> | TRef<TObject<TProperties>>;

@@ -1,4 +1,4 @@
-import { Type, Static } from '@sinclair/typebox'
+import { Type, Static, Kind } from '@sinclair/typebox'
 
 const T = Type.Object({
     x: Type.String(),
@@ -6,11 +6,7 @@ const T = Type.Object({
     z: Type.String()
 }, { $id: 'T' })
 
-const R = Type.Ref(T)
-
-const K = Type.KeyOf(R)
-
-type T = Static<typeof K>
-
-console.log(K)
+const P = Type.Partial(T)
+const X = Type.Required(P)
+console.log(Type.Strict(X))
 

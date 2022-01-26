@@ -27,40 +27,20 @@ THE SOFTWARE.
 ---------------------------------------------------------------------------*/
 
 // --------------------------------------------------------------------------
+// Symbols
+// --------------------------------------------------------------------------
+
+export const Kind          = Symbol.for('Kind')
+export const Modifier      = Symbol.for('Modifier')
+
+// --------------------------------------------------------------------------
 // Modifiers
 // --------------------------------------------------------------------------
 
-export const ReadonlyOptionalModifier            = Symbol('ReadonlyOptionalModifier')
-export const OptionalModifier                    = Symbol('OptionalModifier')
-export const ReadonlyModifier                    = Symbol('ReadonlyModifier')
-
 export type TModifier                            = TReadonlyOptional<TSchema> | TOptional<TSchema> | TReadonly<TSchema>
-export type TReadonlyOptional<T extends TSchema> = T & { modifier: typeof ReadonlyOptionalModifier }
-export type TOptional<T extends TSchema>         = T & { modifier: typeof OptionalModifier }
-export type TReadonly<T extends TSchema>         = T & { modifier: typeof ReadonlyModifier }
-
-// --------------------------------------------------------------------------
-// Schema Standard
-// --------------------------------------------------------------------------
-
-export const NamespaceKind = Symbol('NamespaceKind')
-export const KeyOfKind     = Symbol('KeyOfKind')
-export const IntersectKind = Symbol('IntersectKind')
-export const UnionKind     = Symbol('UnionKind')
-export const TupleKind     = Symbol('TupleKind')
-export const ObjectKind    = Symbol('ObjectKind')
-export const RecordKind    = Symbol('RecordKind')
-export const ArrayKind     = Symbol('ArrayKind')
-export const EnumKind      = Symbol('EnumKind')
-export const LiteralKind   = Symbol('LiteralKind')
-export const StringKind    = Symbol('StringKind')
-export const NumberKind    = Symbol('NumberKind')
-export const IntegerKind   = Symbol('IntegerKind')
-export const BooleanKind   = Symbol('BooleanKind')
-export const NullKind      = Symbol('NullKind')
-export const UnknownKind   = Symbol('UnknownKind')
-export const AnyKind       = Symbol('AnyKind')
-export const RefKind       = Symbol('RefKind')
+export type TReadonlyOptional<T extends TSchema> = T & { [Modifier]: 'ReadonlyOptionalModifier' }
+export type TOptional<T extends TSchema>         = T & { [Modifier]: 'OptionalModifier' }
+export type TReadonly<T extends TSchema>         = T & { [Modifier]: 'ReadonlyModifier' }
 
 // --------------------------------------------------------------------------
 // Options
@@ -117,7 +97,7 @@ export type ObjectOptions = {
 // --------------------------------------------------------------------------
 
 export type TDefinitions                       = { [key: string]: TSchema }
-export type TNamespace<T extends TDefinitions> = { kind: typeof NamespaceKind, $defs: T } & CustomOptions
+export type TNamespace<T extends TDefinitions> = { [Kind]: 'NamespaceKind', $defs: T } & CustomOptions
 
 // --------------------------------------------------------------------------
 // TSchema
@@ -136,39 +116,33 @@ export type TRecordKey         = TString | TNumber | TKeyOf<any> | TUnion<any>
 export type TEnumKey<T = TKey> = { type: 'number' | 'string', const: T }
 
 export interface TProperties { [key: string]: TSchema }
-export interface TRecord    <K extends TRecordKey, T extends TSchema> extends TSchema, ObjectOptions         { $static: StaticRecord<K, T>, kind: typeof RecordKind,    type: 'object', patternProperties: { [pattern: string]: T } }
-export interface TTuple     <T extends TSchema[]>                     extends TSchema, CustomOptions         { $static: StaticTuple<T>,     kind: typeof TupleKind,     type: 'array', items?: T, additionalItems?: false, minItems: number, maxItems: number }
-export interface TObject    <T extends TProperties>                   extends TSchema, ObjectOptions         { $static: StaticObject<T>,    kind: typeof ObjectKind,    type: 'object', properties: T, required?: string[] } 
-export interface TUnion     <T extends TSchema[]>                     extends TSchema, CustomOptions         { $static: StaticUnion<T>,     kind: typeof UnionKind,     anyOf: T }
-export interface TIntersect <T extends TSchema[]>                     extends TSchema, IntersectOptions      { $static: StaticIntersect<T>, kind: typeof IntersectKind, type: 'object', allOf: T }
-export interface TKeyOf     <T extends TKey[]>                        extends TSchema, CustomOptions         { $static: StaticKeyOf<T>,     kind: typeof KeyOfKind,     type: 'string', enum: T }
-export interface TArray     <T extends TSchema>                       extends TSchema, ArrayOptions          { $static: StaticArray<T>,     kind: typeof ArrayKind,     type: 'array', items: T } 
-export interface TLiteral   <T extends TValue>                        extends TSchema, CustomOptions         { $static: StaticLiteral<T>,   kind: typeof LiteralKind,   const: T }
-export interface TEnum      <T extends TEnumKey[]>                    extends TSchema, CustomOptions         { $static: StaticEnum<T>,      kind: typeof EnumKind,      anyOf: T }
-export interface TRef       <T extends TSchema>                       extends TSchema, CustomOptions         { $static: Static<T>,          kind: typeof RefKind,       $ref: string  }
-export interface TString                                              extends TSchema, StringOptions<string> { $static: string,             kind: typeof StringKind,    type: 'string' }
-export interface TNumber                                              extends TSchema, NumberOptions         { $static: number,             kind: typeof NumberKind,    type: 'number' }
-export interface TInteger                                             extends TSchema, NumberOptions         { $static: number,             kind: typeof IntegerKind,   type: 'integer' } 
-export interface TBoolean                                             extends TSchema, CustomOptions         { $static: boolean,            kind: typeof BooleanKind,   type: 'boolean' } 
-export interface TNull                                                extends TSchema, CustomOptions         { $static: null,               kind: typeof NullKind,      type: 'null' }
-export interface TUnknown                                             extends TSchema, CustomOptions         { $static: unknown,            kind: typeof UnknownKind }
-export interface TAny                                                 extends TSchema, CustomOptions         { $static: any,                kind: typeof AnyKind }
-
+export interface TRecord    <K extends TRecordKey, T extends TSchema> extends TSchema, ObjectOptions         { $static: StaticRecord<K, T>, [Kind]: 'RecordKind',    type: 'object', patternProperties: { [pattern: string]: T } }
+export interface TTuple     <T extends TSchema[]>                     extends TSchema, CustomOptions         { $static: StaticTuple<T>,     [Kind]: 'TupleKind',     type: 'array', items?: T, additionalItems?: false, minItems: number, maxItems: number }
+export interface TObject    <T extends TProperties>                   extends TSchema, ObjectOptions         { $static: StaticObject<T>,    [Kind]: 'ObjectKind',    type: 'object', properties: T, required?: string[] } 
+export interface TUnion     <T extends TSchema[]>                     extends TSchema, CustomOptions         { $static: StaticUnion<T>,     [Kind]: 'UnionKind',     anyOf: T }
+export interface TIntersect <T extends TSchema[]>                     extends TSchema, IntersectOptions      { $static: StaticIntersect<T>, [Kind]: 'IntersectKind', type: 'object', allOf: T }
+export interface TKeyOf     <T extends TKey[]>                        extends TSchema, CustomOptions         { $static: StaticKeyOf<T>,     [Kind]: 'KeyOfKind',     type: 'string', enum: T }
+export interface TArray     <T extends TSchema>                       extends TSchema, ArrayOptions          { $static: StaticArray<T>,     [Kind]: 'ArrayKind',     type: 'array', items: T } 
+export interface TLiteral   <T extends TValue>                        extends TSchema, CustomOptions         { $static: StaticLiteral<T>,   [Kind]: 'LiteralKind',   const: T }
+export interface TEnum      <T extends TEnumKey[]>                    extends TSchema, CustomOptions         { $static: StaticEnum<T>,      [Kind]: 'EnumKind',      anyOf: T }
+export interface TRef       <T extends TSchema>                       extends TSchema, CustomOptions         { $static: Static<T>,          [Kind]: 'RefKind',       $ref: string  }
+export interface TString                                              extends TSchema, StringOptions<string> { $static: string,             [Kind]: 'StringKind',    type: 'string' }
+export interface TNumber                                              extends TSchema, NumberOptions         { $static: number,             [Kind]: 'NumberKind',    type: 'number' }
+export interface TInteger                                             extends TSchema, NumberOptions         { $static: number,             [Kind]: 'IntegerKind',   type: 'integer' } 
+export interface TBoolean                                             extends TSchema, CustomOptions         { $static: boolean,            [Kind]: 'BooleanKind',   type: 'boolean' } 
+export interface TNull                                                extends TSchema, CustomOptions         { $static: null,               [Kind]: 'NullKind',      type: 'null' }
+export interface TUnknown                                             extends TSchema, CustomOptions         { $static: unknown,            [Kind]: 'UnknownKind' }
+export interface TAny                                                 extends TSchema, CustomOptions         { $static: any,                [Kind]: 'AnyKind' }
 
 // --------------------------------------------------------------------------
 // Extended Schema Types
 // --------------------------------------------------------------------------
 
-export const ConstructorKind = Symbol('ConstructorKind')
-export const FunctionKind    = Symbol('FunctionKind')
-export const PromiseKind     = Symbol('PromiseKind')
-export const UndefinedKind   = Symbol('UndefinedKind')
-export const VoidKind        = Symbol('VoidKind')
-export interface TConstructor <T extends TSchema[], U extends TSchema> extends TSchema, CustomOptions { $static: StaticConstructor<T, U>, kind: typeof ConstructorKind, type: 'constructor', arguments: TSchema[], returns: TSchema }
-export interface TFunction    <T extends TSchema[], U extends TSchema> extends TSchema, CustomOptions { $static: StaticFunction<T, U>, kind: typeof FunctionKind, type: 'function', arguments: TSchema[], returns: TSchema }
-export interface TPromise     <T extends TSchema>                      extends TSchema, CustomOptions { $static: StaticPromise<T>, kind: typeof PromiseKind, type: 'promise', item: TSchema }
-export interface TUndefined                                            extends TSchema, CustomOptions { $static: undefined, kind: typeof UndefinedKind, type: 'undefined' }
-export interface TVoid                                                 extends TSchema, CustomOptions { $static: void, kind: typeof VoidKind, type: 'void' }
+export interface TConstructor <T extends TSchema[], U extends TSchema> extends TSchema, CustomOptions { $static: StaticConstructor<T, U>, [Kind]: 'ConstructorKind', type: 'constructor', arguments: TSchema[], returns: TSchema }
+export interface TFunction    <T extends TSchema[], U extends TSchema> extends TSchema, CustomOptions { $static: StaticFunction<T, U>, [Kind]: 'FunctionKind', type: 'function', arguments: TSchema[], returns: TSchema }
+export interface TPromise     <T extends TSchema>                      extends TSchema, CustomOptions { $static: StaticPromise<T>, [Kind]: 'PromiseKind', type: 'promise', item: TSchema }
+export interface TUndefined                                            extends TSchema, CustomOptions { $static: undefined, [Kind]: 'UndefinedKind', type: 'undefined' }
+export interface TVoid                                                 extends TSchema, CustomOptions { $static: void, [Kind]: 'VoidKind', type: 'void' }
 
 // --------------------------------------------------------------------------
 // Utility Types
@@ -214,6 +188,7 @@ export type StaticRecord <K extends TRecordKey, T extends TSchema> =
     K extends TKeyOf<TKey[]>    ? Record<K['$static'], Static<T>> : 
     K extends TUnion<TSchema[]> ? Record<K['$static'], Static<T>> :
     never
+
 export type StaticEnum        <T>                                               = T extends TEnumKey<infer U>[] ? U : never
 export type StaticKeyOf       <T extends TKey[]>                                = T extends Array<infer K> ? K : never
 export type StaticIntersect   <T extends readonly TSchema[]>                    = StaticIntersectReduce<unknown, StaticIntersectEvaluate<T>>
@@ -241,8 +216,14 @@ function isArray(object: any) {
 }
 
 function clone(object: any): any {
-    if(isObject(object)) return Object.keys(object).reduce<any>((acc, key) => ({...acc, [key]: clone(object[key]) }), {})
-    if(isArray(object)) return object.map((item: any) => clone(item))
+    if(isObject(object)) {
+        const result1 = Object.getOwnPropertySymbols(object).reduce<any>((acc, key) => ({...acc, [key]: clone(object[key]) }), {})
+        const result2 = Object.keys(object).reduce<any>((acc, key) => ({...acc, [key]: clone(object[key]) }), result1)
+        return result2
+    }
+    if(isArray(object)) {
+        return object.map((item: any) => clone(item))
+    }
     return object
 }
 
@@ -256,17 +237,17 @@ export class TypeBuilder {
 
     /** `Standard` Modifies an object property to be both readonly and optional */
     public ReadonlyOptional<T extends TSchema>(item: T): TReadonlyOptional<T> {
-        return { ...item, modifier: ReadonlyOptionalModifier }
+        return { [Modifier]: 'ReadonlyOptionalModifier', ...item }
     }
 
     /** `Standard` Modifies an object property to be readonly */
     public Readonly<T extends TSchema>(item: T): TReadonly<T> {
-        return { ...item, modifier: ReadonlyModifier }
+        return { [Modifier]: 'ReadonlyModifier', ...item }
     }
 
      /** `Standard` Modifies an object property to be optional */
     public Optional<T extends TSchema>(item: T): TOptional<T> {
-        return { ...item, modifier: OptionalModifier }
+        return { [Modifier]: 'OptionalModifier', ...item }
     }
 
     /** `Standard` Creates a type type */
@@ -275,8 +256,8 @@ export class TypeBuilder {
         const minItems = items.length
         const maxItems = items.length
         const schema = ((items.length > 0)
-            ? { ...options, kind: TupleKind, type: 'array', items, additionalItems, minItems, maxItems }
-            : { ...options, kind: TupleKind, type: 'array', minItems, maxItems }) as any
+            ? { ...options, [Kind]: 'TupleKind', type: 'array', items, additionalItems, minItems, maxItems }
+            : { ...options, [Kind]: 'TupleKind', type: 'array', minItems, maxItems }) as any
         return this.Store(schema)
     }
 
@@ -284,48 +265,49 @@ export class TypeBuilder {
     public Object<T extends TProperties>(properties: T, options: ObjectOptions = {}): TObject<T> {
         const property_names = Object.keys(properties)
         const optional = property_names.filter(name => {
-            const candidate = properties[name] as TModifier
-            return (candidate.modifier &&
-                (candidate.modifier === OptionalModifier ||
-                    candidate.modifier === ReadonlyOptionalModifier))
+            const property = properties[name] as TModifier
+            const modifier = property[Modifier]
+            return (modifier &&
+                (modifier === 'OptionalModifier' ||
+                    modifier === 'ReadonlyOptionalModifier'))
         })
         const required_names = property_names.filter(name => !optional.includes(name))
         const required = (required_names.length > 0) ? required_names : undefined
         return this.Store(((required) 
-            ? { ...options, kind: ObjectKind, type: 'object', properties, required } 
-            : { ...options, kind: ObjectKind, type: 'object', properties }))
+            ? { ...options, [Kind]: 'ObjectKind', type: 'object', properties, required } 
+            : { ...options, [Kind]: 'ObjectKind', type: 'object', properties }))
     }
 
     /** `Standard` Creates an intersect type. */
     public Intersect<T extends TSchema[]>(items: [...T], options: IntersectOptions = {}): TIntersect<T> {
-        return this.Store({ ...options, kind: IntersectKind, type: 'object', allOf: items })
+        return this.Store({ ...options, [Kind]: 'IntersectKind', type: 'object', allOf: items })
     }
     
     /** `Standard` Creates a union type */
     public Union<T extends TSchema[]>(items: [...T], options: CustomOptions = {}): TUnion<T> {
-        return this.Store({ ...options, kind: UnionKind, anyOf: items })
+        return this.Store({ ...options, [Kind]: 'UnionKind', anyOf: items })
     }
 
     /** `Standard` Creates an array type */
     public Array<T extends TSchema>(items: T, options: ArrayOptions = {}): TArray<T> {
-        return this.Store({ ...options, kind: ArrayKind, type: 'array', items })
+        return this.Store({ ...options, [Kind]: 'ArrayKind', type: 'array', items })
     }
     
     /** `Standard` Creates an enum type from a TypeScript enum */
     public Enum<T extends TEnumType>(item: T, options: CustomOptions = {}): TEnum<TEnumKey<T[keyof T]>[]> {
         const values = Object.keys(item).filter(key => isNaN(key as any)).map(key => item[key]) as T[keyof T][]
         const anyOf  = values.map(value => typeof value === 'string' ? { type: 'string' as const, const: value } : { type: 'number' as const, const: value })
-        return this.Store({ ...options, kind: EnumKind, anyOf })
+        return this.Store({ ...options, [Kind]: 'EnumKind', anyOf })
     }
 
     /** `Standard` Creates a literal type. Supports string, number and boolean values only */
     public Literal<T extends TValue>(value: T, options: CustomOptions = {}): TLiteral<T> {
-        return this.Store({ ...options, kind: LiteralKind, const: value, type: typeof value as 'string' | 'number' | 'boolean' })
+        return this.Store({ ...options, [Kind]: 'LiteralKind', const: value, type: typeof value as 'string' | 'number' | 'boolean' })
     }
 
     /** `Standard` Creates a string type */
     public String<TCustomFormatOption extends string>(options: StringOptions<StringFormatOption | TCustomFormatOption> = {}): TString {
-        return this.Store({ ...options, kind: StringKind, type: 'string' })
+        return this.Store({ ...options, [Kind]: 'StringKind', type: 'string' })
     }
 
     /** `Standard` Creates a string type from a regular expression */
@@ -335,53 +317,53 @@ export class TypeBuilder {
 
     /** `Standard` Creates a number type */
     public Number(options: NumberOptions = {}): TNumber {
-        return this.Store({ ...options, kind: NumberKind, type: 'number' })
+        return this.Store({ ...options, [Kind]: 'NumberKind', type: 'number' })
     }
 
     /** `Standard` Creates an integer type */
     public Integer(options: NumberOptions = {}): TInteger {
-        return this.Store({ ...options, kind: IntegerKind, type: 'integer' })
+        return this.Store({ ...options, [Kind]: 'IntegerKind', type: 'integer' })
     }
 
     /** `Standard` Creates a boolean type */
     public Boolean(options: CustomOptions = {}): TBoolean {
-        return this.Store({ ...options, kind: BooleanKind, type: 'boolean' })
+        return this.Store({ ...options, [Kind]: 'BooleanKind', type: 'boolean' })
     }
 
     /** `Standard` Creates a null type */
     public Null(options: CustomOptions = {}): TNull {
-        return this.Store({ ...options, kind: NullKind, type: 'null' })
+        return this.Store({ ...options, [Kind]: 'NullKind', type: 'null' })
     }
 
     /** `Standard` Creates an unknown type */
     public Unknown(options: CustomOptions = {}): TUnknown {
-        return this.Store({ ...options, kind: UnknownKind })
+        return this.Store({ ...options, [Kind]: 'UnknownKind' })
     }
 
     /** `Standard` Creates an any type */
     public Any(options: CustomOptions = {}): TAny {
-        return this.Store({ ...options, kind: AnyKind })
+        return this.Store({ ...options, [Kind]: 'AnyKind' })
     }
     
     /** `Standard` Creates a record type */
     public Record<K extends TRecordKey, T extends TSchema>(key: K, value: T, options: ObjectOptions = {}): TRecord<K, T> {
         const pattern = (() => {
-            switch(key.kind) {
-                case UnionKind:  return `^${key.anyOf.map((literal: any) => literal.const as TValue).join('|')}$`
-                case KeyOfKind:  return `^${key.enum.join('|')}$`
-                case NumberKind: return '^(0|[1-9][0-9]*)$'
-                case StringKind: return key.pattern ? key.pattern : '^.*$'
+            switch(key[Kind]) {
+                case 'UnionKind':  return `^${key.anyOf.map((literal: any) => literal.const as TValue).join('|')}$`
+                case 'KeyOfKind':  return `^${key.enum.join('|')}$`
+                case 'NumberKind': return '^(0|[1-9][0-9]*)$'
+                case 'StringKind': return key.pattern ? key.pattern : '^.*$'
                 default: throw Error('Invalid Record Key')
             }
         })()
-        return this.Store({ ...options, kind: RecordKind, type: 'object', patternProperties: { [pattern]: value } })
+        return this.Store({ ...options, [Kind]: 'RecordKind', type: 'object', patternProperties: { [pattern]: value } })
     }
 
     /** `Standard` Creates a keyof type from the given object */
     public KeyOf<T extends TObject<TProperties> | TRef<TObject<TProperties>>>(object: T, options: CustomOptions = {}): TKeyOf<SelectablePropertyKeys<T>[]> {
         const source = this.Deref(object)
         const keys = Object.keys(source.properties)
-        return this.Store({...options, kind: KeyOfKind, type: 'string', enum: keys })
+        return this.Store({...options, [Kind]: 'KeyOfKind', type: 'string', enum: keys })
     }
 
     /** `Standard` Makes all properties in the given object type required */
@@ -390,12 +372,15 @@ export class TypeBuilder {
         const schema = { ...clone(source), ...options }
         schema.required = Object.keys(schema.properties)
         for(const key of Object.keys(schema.properties)) {
-            const property = schema.properties[key]
-            switch(property.modifier) {
-                case ReadonlyOptionalModifier: property.modifier = ReadonlyModifier; break;
-                case ReadonlyModifier: property.modifier = ReadonlyModifier; break;
-                case OptionalModifier: delete property.modifier; break;
-                default: delete property.modifier; break;
+            const property = schema.properties[key] as TModifier
+            const modifier = property[Modifier]
+            switch(modifier) {
+                case 'ReadonlyOptionalModifier': property[Modifier] = 'ReadonlyModifier'; break;
+                case 'ReadonlyModifier': property[Modifier] = 'ReadonlyModifier'; break;
+                // @ts-ignore
+                case 'OptionalModifier': delete property[Modifier]; break;
+                // @ts-ignore
+                default: delete property[Modifier]; break;
             }
         }
         return this.Store(schema)
@@ -407,12 +392,13 @@ export class TypeBuilder {
         const schema = { ...clone(source), ...options }
         delete schema.required
         for(const key of Object.keys(schema.properties)) {
-            const property = schema.properties[key]
-            switch(property.modifier) {
-                case ReadonlyOptionalModifier: property.modifier = ReadonlyOptionalModifier; break;
-                case ReadonlyModifier: property.modifier = ReadonlyOptionalModifier; break;
-                case OptionalModifier: property.modifier = OptionalModifier; break;
-                default: property.modifier = OptionalModifier; break;
+            const property = schema.properties[key] as TModifier
+            const modifier = property[Modifier]
+            switch(modifier) {
+                case 'ReadonlyOptionalModifier': property[Modifier] = 'ReadonlyOptionalModifier'; break;
+                case 'ReadonlyModifier': property[Modifier] = 'ReadonlyOptionalModifier'; break;
+                case 'OptionalModifier': property[Modifier] = 'OptionalModifier'; break;
+                default: property[Modifier] = 'OptionalModifier'; break;
             }
         }
         return this.Store(schema)
@@ -447,32 +433,32 @@ export class TypeBuilder {
     
     /** `Extended` Creates a constructor type */
     public Constructor<T extends TSchema[], U extends TSchema>(args: [...T], returns: U, options: CustomOptions = {}): TConstructor<T, U> {
-        return this.Store({ ...options, kind: ConstructorKind, type: 'constructor', arguments: args, returns })
+        return this.Store({ ...options, [Kind]: 'ConstructorKind', type: 'constructor', arguments: args, returns })
     }
 
     /** `Extended` Creates a function type */
     public Function<T extends TSchema[], U extends TSchema>(args: [...T], returns: U, options: CustomOptions = {}): TFunction<T, U> {
-        return this.Store({ ...options, kind: FunctionKind, type: 'function', arguments: args, returns })
+        return this.Store({ ...options, [Kind]: 'FunctionKind', type: 'function', arguments: args, returns })
     }
 
     /** `Extended` Creates a promise type */
     public Promise<T extends TSchema>(item: T, options: CustomOptions = {}): TPromise<T> {
-        return this.Store({ ...options, type: 'promise', kind: PromiseKind, item })
+        return this.Store({ ...options, [Kind]: 'PromiseKind', type: 'promise', item })
     }
 
     /** `Extended` Creates a undefined type */
     public Undefined(options: CustomOptions = {}): TUndefined {
-        return this.Store({ ...options, type: 'undefined', kind: UndefinedKind })
+        return this.Store({ ...options, [Kind]: 'UndefinedKind', type: 'undefined' })
     }
 
     /** `Extended` Creates a void type */
     public Void(options: CustomOptions = {}): TVoid {
-        return this.Store({ ...options, type: 'void', kind: VoidKind })
+        return this.Store({ ...options, [Kind]: 'VoidKind', type: 'void' })
     }
     
     /** `Standard` Creates a namespace for a set of related types */
     public Namespace<T extends TDefinitions>($defs: T, options: CustomOptions = {}): TNamespace<T> {
-        return this.Store({ ...options, kind: NamespaceKind, $defs })
+        return this.Store({ ...options, [Kind]: 'NamespaceKind', $defs })
     }
     
     /** `Standard` References a type within a namespace. The referenced namespace must specify an `$id` */
@@ -487,12 +473,12 @@ export class TypeBuilder {
             const targetKey = args[1] as string
             if(namespace.$id === undefined) throw new Error(`Referenced namespace has no $id`)
             if(!this.schemas.has(namespace.$id)) throw new Error(`Unable to locate namespace with $id '${namespace.$id}'`)
-            return this.Store({ kind: RefKind, $ref: `${namespace.$id}#/$defs/${targetKey}` })
+            return this.Store({ [Kind]: 'RefKind', $ref: `${namespace.$id}#/$defs/${targetKey}` })
         } else if(args.length === 1) {
             const target = args[0] as any
             if(target.$id === undefined) throw new Error(`Referenced schema has no $id`)
             if(!this.schemas.has(target.$id)) throw new Error(`Unable to locate schema with $id '${target.$id}'`)
-            return this.Store({ kind: RefKind, $ref: target.$id })
+            return this.Store({ [Kind]: 'RefKind', $ref: target.$id })
         } else {
             throw new Error('Type.Ref: Invalid arguments')
         }
@@ -516,7 +502,7 @@ export class TypeBuilder {
     /** Conditionally dereferences a schema if RefKind. Otherwise return argument */
     protected Deref<T extends TSchema>(schema: T): any {
         const $schema: any = schema
-        if($schema['kind'] !== RefKind) return schema
+        if($schema[Kind] !== 'RefKind') return schema
         if(!this.schemas.has($schema['$ref'])) throw Error(`Unable to locate schema with $id '${$schema['$ref']}'`)
         return this.Deref(this.schemas.get($schema['$ref'])!)
     }
