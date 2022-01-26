@@ -24,10 +24,10 @@ describe('Partial', () => {
             w: Type.Number()
         }, { additionalProperties: false })
         const T = Type.Partial(A)
-        strictEqual(T.properties.x[Modifier], 'ReadonlyOptionalModifier')
-        strictEqual(T.properties.y[Modifier], 'ReadonlyOptionalModifier')
-        strictEqual(T.properties.z[Modifier], 'OptionalModifier')
-        strictEqual(T.properties.w[Modifier], 'OptionalModifier')
+        strictEqual(T.properties.x[Modifier], 'ReadonlyOptional')
+        strictEqual(T.properties.y[Modifier], 'ReadonlyOptional')
+        strictEqual(T.properties.z[Modifier], 'Optional')
+        strictEqual(T.properties.w[Modifier], 'Optional')
     })
 
     it('Should inherit options from the source object', () => {

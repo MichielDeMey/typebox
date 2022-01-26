@@ -12,8 +12,8 @@ describe('Modifier', () => {
         const P = JSON.parse(S) as any
 
         // check assignment on Type
-        assert.equal(T.properties.a[Modifier], 'ReadonlyModifier')
-        assert.equal(T.properties.b[Modifier], 'OptionalModifier')
+        assert.equal(T.properties.a[Modifier], 'Readonly')
+        assert.equal(T.properties.b[Modifier], 'Optional')
 
         // check deserialized
         assert.equal(P.properties.a[Modifier], undefined)

@@ -25,10 +25,10 @@ describe('Required', () => {
             w: Type.Number()
         })
         const T = Type.Required(A)
-        strictEqual(T.properties.x[Modifier], 'ReadonlyModifier')
-        strictEqual(T.properties.y[Modifier], 'ReadonlyModifier')
-        strictEqual((<any>T.properties.z)[Modifier], undefined)
-        strictEqual((<any>T.properties.w)[Modifier], undefined)
+        strictEqual(T.properties.x[Modifier], 'Readonly')
+        strictEqual(T.properties.y[Modifier], 'Readonly')
+        strictEqual(T.properties.z[Modifier], undefined)
+        strictEqual(T.properties.w[Modifier], undefined)
     })
 
     it('Should inherit options from the source object', () => {

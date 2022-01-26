@@ -9,7 +9,6 @@ import { Type } from './typebox'
             C: Type.Null(),
         })
     )
-
     Spec.expectType<'A' | 'B' | 'C'>(Spec.infer(K))
 }
 
@@ -21,7 +20,7 @@ import { Type } from './typebox'
             C: Type.Null(),
         }), ['A', 'B']
     )
-
+    
     const K = Type.KeyOf(
         Type.Pick(
             Type.Object({
@@ -31,8 +30,9 @@ import { Type } from './typebox'
             }), ['A', 'B']
         )
     )
-    
-    Spec.expectType<'A' | 'B'>(Spec.infer(K))
+
+    const X = Spec.infer(K);
+    Spec.expectAssignable<'A' | 'B'>(X)
 }
 
 {
