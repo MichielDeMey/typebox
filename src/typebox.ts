@@ -207,11 +207,11 @@ export type Static            <T extends TSchema>                               
 // Utility
 // --------------------------------------------------------------------------
 
-function isObject(object: any) {
+function isObject(object: any): object is Record<string | symbol, any> {
     return typeof object === 'object' && object !== null && !Array.isArray(object)
 }
 
-function isArray(object: any) {
+function isArray(object: any): object is any[] {
     return typeof object === 'object' && object !== null && Array.isArray(object)
 }
 
@@ -369,17 +369,15 @@ export class TypeBuilder {
     /** `Standard` Makes all properties in the given object type required */
     public Required<T extends TObject<TProperties> | TRef<TObject<TProperties>>>(object: T, options: ObjectOptions = {}): TObject<StaticRequired<T['properties']>> {
         const source = this.Deref(object)
-        const schema = { ...clone(source), ...options }
+        const schema = { ...clone(source) as T, ...options }
         schema.required = Object.keys(schema.properties)
         for(const key of Object.keys(schema.properties)) {
-            const property = schema.properties[key] as TModifier
+            const property = schema.properties[key]
             const modifier = property[Modifier]
             switch(modifier) {
                 case 'ReadonlyOptionalModifier': property[Modifier] = 'ReadonlyModifier'; break;
                 case 'ReadonlyModifier': property[Modifier] = 'ReadonlyModifier'; break;
-                // @ts-ignore
                 case 'OptionalModifier': delete property[Modifier]; break;
-                // @ts-ignore
                 default: delete property[Modifier]; break;
             }
         }
@@ -389,10 +387,10 @@ export class TypeBuilder {
     /** `Standard` Makes all properties in the given object type optional */
     public Partial<T extends TObject<TProperties> | TRef<TObject<TProperties>>>(object: T, options: ObjectOptions = {}): TObject<StaticPartial<T['properties']>> {
         const source = this.Deref(object)
-        const schema = { ...clone(source), ...options }
+        const schema = { ...clone(source) as T, ...options }
         delete schema.required
         for(const key of Object.keys(schema.properties)) {
-            const property = schema.properties[key] as TModifier
+            const property = schema.properties[key]
             const modifier = property[Modifier]
             switch(modifier) {
                 case 'ReadonlyOptionalModifier': property[Modifier] = 'ReadonlyOptionalModifier'; break;
