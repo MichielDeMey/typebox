@@ -177,9 +177,9 @@ export interface TObject<T extends TProperties = TProperties> extends TSchema, O
     properties: T;
     required?: string[];
 }
-export interface TOmit<T extends TObject | TIntersect, Properties extends keyof T['properties']> extends TObject {
-    $static: Omit<T['$static'], Properties>;
-    properties: Omit<T['properties'], Properties>;
+export interface TOmit<T extends TObject, Properties extends Array<keyof T['properties']>> extends TObject {
+    $static: Omit<T['$static'], Properties[number] extends keyof T['$static'] ? Properties[number] : never>;
+    properties: T extends TObject ? Omit<T['properties'], Properties[number]> : never;
 }
 export interface TParameters<Function extends TFunction> extends TSchema {
     $static: Parameters<Function['$static']>;
@@ -187,9 +187,9 @@ export interface TParameters<Function extends TFunction> extends TSchema {
 export interface TPartial<T extends TObject | TRef<TObject>> extends TObject {
     $static: Partial<T['$static']>;
 }
-export interface TPick<T extends TObject, Properties extends keyof T['properties']> extends TObject {
-    $static: Pick<T['$static'], Properties extends keyof T['$static'] ? Properties : never>;
-    properties: T extends TObject ? Pick<T['properties'], Properties> : never;
+export interface TPick<T extends TObject, Properties extends Array<keyof T['properties']>> extends TObject {
+    $static: Pick<T['$static'], Properties[number] extends keyof T['$static'] ? Properties[number] : never>;
+    properties: T extends TObject ? Pick<T['properties'], Properties[number]> : never;
 }
 export interface TPromise<T extends TSchema> extends TSchema {
     $static: Promise<T['$static']>;
@@ -307,13 +307,13 @@ export declare class TypeBuilder {
     /** `Standard` Creates an object type with the given properties */
     Object<T extends TProperties>(properties: T, options?: ObjectOptions): TObject<T>;
     /** `Standard` Omits property keys from the given object type */
-    Omit<T extends TObject, Properties extends keyof T['properties']>(object: T, keys: Properties[], options?: SchemaOptions): TOmit<T, Properties>;
+    Omit<T extends TObject, Keys extends Array<keyof T['properties']>>(object: T, keys: [...Keys], options?: SchemaOptions): TOmit<T, Keys>;
     /** `Extended` Creates a tuple type by extracting the given functions parameters */
     Parameters<Function extends TFunction<TSchema[], TSchema>>(f: Function): TParameters<Function>;
     /** `Standard` Makes all properties in the given object type optional */
     Partial<T extends TObject | TRef<TObject>>(object: T, options?: ObjectOptions): TPartial<T>;
     /** `Standard` Picks property keys from the given object type */
-    Pick<T extends TObject, Properties extends keyof T['properties']>(object: T, keys: Properties[], options?: SchemaOptions): TPick<T, Properties>;
+    Pick<T extends TObject, Keys extends Array<keyof T['properties']>>(object: T, keys: [...Keys], options?: SchemaOptions): TPick<T, Keys>;
     /** `Extended` Creates a promise type */
     Promise<T extends TSchema>(item: T, options?: SchemaOptions): TPromise<T>;
     /** `Standard` Creates a record type */
@@ -343,7 +343,7 @@ export declare class TypeBuilder {
     /** `Standard` Omits the `kind` and `modifier` properties from the underlying schema */
     Strict<T extends TSchema>(schema: T, options?: SchemaOptions): T;
     /** Conditionally stores and schema if it contains an $id and returns  */
-    protected Store<T extends TSchema | TNamespace<TDefinitions>, S = Omit<T, '$static'>>(schema: S): T;
+    protected Create<T extends TSchema | TNamespace<TDefinitions>, S = Omit<T, '$static'>>(schema: S): T;
     /** Conditionally dereferences a schema if RefKind. Otherwise return argument */
     protected Deref<T extends TSchema>(schema: T): any;
 }

@@ -13,14 +13,6 @@ import { Type } from './typebox'
 }
 
 {
-    const Q = Type.Pick(
-        Type.Object({
-            A: Type.Null(),
-            B: Type.Null(),
-            C: Type.Null(),
-        }), ['A', 'B']
-    )
-    
     const K = Type.KeyOf(
         Type.Pick(
             Type.Object({
@@ -30,9 +22,9 @@ import { Type } from './typebox'
             }), ['A', 'B']
         )
     )
+   
 
-    const X = Spec.infer(K);
-    Spec.expectAssignable<'A' | 'B'>(X)
+    Spec.expectAssignable<'A' | 'B'>(Spec.infer(K))
 }
 
 {
