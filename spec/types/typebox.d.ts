@@ -50,11 +50,8 @@ export interface TConstructor<T extends TSchema[] = TSchema[], U extends TSchema
     $static: new (...param: StaticConstructorParameters<T>) => U['$static'];
     [Kind]: 'Constructor';
     type: 'constructor';
-    arguments: T;
+    parameters: T;
     returns: U;
-}
-export interface TConstructorParameters<Constructor extends TConstructor> extends TSchema {
-    $static: ConstructorParameters<Constructor['$static']>;
 }
 export interface TEnumOption<T> {
     type: 'number' | 'string';
@@ -68,11 +65,11 @@ export interface TEnum<T extends Record<string, string | number>> extends TSchem
 declare type StaticParameters<T extends readonly TSchema[]> = [...{
     [K in keyof T]: T[K] extends TSchema ? T[K]['$static'] : never;
 }];
-export interface TFunction<T extends TSchema[] = TSchema[], U extends TSchema = TSchema> extends TSchema {
+export interface TFunction<T extends readonly TSchema[] = TSchema[], U extends TSchema = TSchema> extends TSchema {
     $static: (...param: StaticParameters<T>) => U['$static'];
     [Kind]: 'Function';
     type: 'function';
-    arguments: T;
+    parameters: T;
     returns: U;
 }
 export interface IntegerOptions extends SchemaOptions {
@@ -181,9 +178,6 @@ export interface TOmit<T extends TObject, Properties extends Array<keyof T['prop
     $static: Omit<T['$static'], Properties[number] extends keyof T['$static'] ? Properties[number] : never>;
     properties: T extends TObject ? Omit<T['properties'], Properties[number]> : never;
 }
-export interface TParameters<Function extends TFunction> extends TSchema {
-    $static: Parameters<Function['$static']>;
-}
 export interface TPartial<T extends TObject | TRef<TObject>> extends TObject {
     $static: Partial<T['$static']>;
 }
@@ -281,13 +275,11 @@ export declare class TypeBuilder {
     /** `Standard` Creates a boolean type */
     Boolean(options?: SchemaOptions): TBoolean;
     /** `Extended` Creates a constructor type */
-    Constructor<T extends TSchema[], U extends TSchema>(args: [...T], returns: U, options?: SchemaOptions): TConstructor<T, U>;
-    /** `Extended` Creates a tuple type by extracting the given constructor parameters */
-    ConstructorParameters<Constructor extends TConstructor>(f: Constructor): TConstructorParameters<Constructor>;
+    Constructor<T extends TSchema[], U extends TSchema>(parameters: [...T], returns: U, options?: SchemaOptions): TConstructor<T, U>;
     /** `Standard` Creates an enum type from a TypeScript enum */
     Enum<T extends Record<string, string | number>>(item: T, options?: SchemaOptions): TEnum<T>;
     /** `Extended` Creates a function type */
-    Function<T extends TSchema[], U extends TSchema>(args: [...T], returns: U, options?: SchemaOptions): TFunction<T, U>;
+    Function<T extends readonly TSchema[], U extends TSchema>(parameters: [...T], returns: U, options?: SchemaOptions): TFunction<T, U>;
     /** `Standard` Creates an integer type */
     Integer(options?: IntegerOptions): TInteger;
     /** `Standard` Creates an intersect type. */
@@ -308,8 +300,6 @@ export declare class TypeBuilder {
     Object<T extends TProperties>(properties: T, options?: ObjectOptions): TObject<T>;
     /** `Standard` Omits property keys from the given object type */
     Omit<T extends TObject, Keys extends Array<keyof T['properties']>>(object: T, keys: [...Keys], options?: SchemaOptions): TOmit<T, Keys>;
-    /** `Extended` Creates a tuple type by extracting the given functions parameters */
-    Parameters<Function extends TFunction<TSchema[], TSchema>>(f: Function): TParameters<Function>;
     /** `Standard` Makes all properties in the given object type optional */
     Partial<T extends TObject | TRef<TObject>>(object: T, options?: ObjectOptions): TPartial<T>;
     /** `Standard` Picks property keys from the given object type */
@@ -343,7 +333,7 @@ export declare class TypeBuilder {
     /** `Standard` Omits the `kind` and `modifier` properties from the underlying schema */
     Strict<T extends TSchema>(schema: T, options?: SchemaOptions): T;
     /** Conditionally stores and schema if it contains an $id and returns  */
-    protected Create<T extends TSchema | TNamespace<TDefinitions>, S = Omit<T, '$static'>>(schema: S): T;
+    protected Create<T extends TSchema>(schema: Omit<T, '$static'>): T;
     /** Conditionally dereferences a schema if RefKind. Otherwise return argument */
     protected Deref<T extends TSchema>(schema: T): any;
 }

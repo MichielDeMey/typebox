@@ -619,7 +619,7 @@ export class TypeBuilder {
                 default: property[Modifier] = 'Optional'; break;
             }
         }
-        return this.Create(schema)
+        return this.Create(schema as any)
     }
 
     /** `Standard` Picks property keys from the given object type */
@@ -656,7 +656,7 @@ export class TypeBuilder {
     public Rec<T extends TSchema>(callback: (self: TAny) => T, options: SchemaOptions = {}): T {
         const $id = options.$id || ''
         const self = callback({ $ref: `${$id}#/$defs/self` } as any)
-        return this.Create({ ...options, $ref: `${$id}#/$defs/self`, $defs: { self } })
+        return this.Create({ ...options, $ref: `${$id}#/$defs/self`, $defs: { self } } as any)
     }
 
     /** `Standard` References a type within a namespace. The referenced namespace must specify an `$id` */
@@ -702,7 +702,7 @@ export class TypeBuilder {
                 default: delete property[Modifier]; break;
             }
         }
-        return this.Create(schema)
+        return this.Create({ ...schema } as any)
     }
 
     /** `Standard` Creates a string type */
@@ -747,7 +747,7 @@ export class TypeBuilder {
     }
 
     /** Conditionally stores and schema if it contains an $id and returns  */
-    protected Create<T extends TSchema | TNamespace<TDefinitions>, S = Omit<T, '$static'>>(schema: S): T {
+    protected Create<T extends TSchema>(schema: Omit<T, '$static'>): T {
         const $schema: any = schema
         if (!$schema['$id']) return $schema
         this.schemas.set($schema['$id'], $schema)
