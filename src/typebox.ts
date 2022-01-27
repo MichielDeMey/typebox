@@ -107,7 +107,7 @@ export interface TConstructor<T extends TSchema[] = TSchema[], U extends TSchema
     $static: new (...param: StaticConstructorParameters<T>) => U['$static'],
     [Kind]: 'Constructor',
     type: 'constructor',
-    arguments: T,
+    parameters: T,
     returns: U
 }
 
@@ -115,8 +115,14 @@ export interface TConstructor<T extends TSchema[] = TSchema[], U extends TSchema
 // TConstructorParameters
 // --------------------------------------------------------------------------
 
-export interface TConstructorParameters<Constructor extends TConstructor> extends TSchema {
+export interface TConstructorParameters<Constructor extends TConstructor<TSchema[], TSchema>> extends TSchema {
     $static: ConstructorParameters<Constructor['$static']>
+    [Kind]: 'ConstructorParameters'
+    type: 'array'
+    items?: Constructor['parameters']
+    additionalItems?: false
+    minItems: number
+    maxItems: number
 }
 
 // --------------------------------------------------------------------------
@@ -140,11 +146,11 @@ export interface TEnum<T extends Record<string, string | number>> extends TSchem
 
 type StaticParameters<T extends readonly TSchema[]> = [...{ [K in keyof T]: T[K] extends TSchema ? T[K]['$static'] : never }]
 
-export interface TFunction<T extends TSchema[] = TSchema[], U extends TSchema = TSchema> extends TSchema {
+export interface TFunction<T extends readonly TSchema[] = TSchema[], U extends TSchema = TSchema> extends TSchema {
     $static: (...param: StaticParameters<T>) => U['$static'],
     [Kind]: 'Function',
     type: 'function',
-    arguments: T,
+    parameters: T,
     returns: U
 }
 
@@ -299,8 +305,14 @@ export interface TOmit<T extends TObject, Properties extends Array<keyof T['prop
 // TParameters
 // --------------------------------------------------------------------------
 
-export interface TParameters<Function extends TFunction> extends TSchema {
+export interface TParameters<Function extends TFunction<TSchema[], TSchema>> extends TSchema {
     $static: Parameters<Function['$static']>
+    [Kind]: 'Parameters'
+    type: 'array'
+    items?: Function['parameters']
+    additionalItems?: false
+    minItems: number
+    maxItems: number
 }
 
 // --------------------------------------------------------------------------
@@ -377,6 +389,12 @@ export interface TRegEx extends TSchema {
 export interface TRequired<T extends TObject | TRef<TObject>> extends TObject {
     $static: Required<T['$static']>
 }
+
+// --------------------------------------------------------------------------
+// TReturnType
+// --------------------------------------------------------------------------
+
+export type TReturnType<T extends TFunction<TSchema[], TSchema>> = T['returns']
 
 // --------------------------------------------------------------------------
 // TString
@@ -534,13 +552,19 @@ export class TypeBuilder {
     }
 
     /** `Extended` Creates a constructor type */
-    public Constructor<T extends TSchema[], U extends TSchema>(args: [...T], returns: U, options: SchemaOptions = {}): TConstructor<T, U> {
-        return this.Create({ ...options, [Kind]: 'Constructor', type: 'constructor', arguments: args, returns })
+    public Constructor<T extends TSchema[], U extends TSchema>(parameters: [...T], returns: U, options: SchemaOptions = {}): TConstructor<T, U> {
+        return this.Create({ ...options, [Kind]: 'Constructor', type: 'constructor', parameters, returns })
     }
 
     /** `Extended` Creates a tuple type by extracting the given constructor parameters */
-    public ConstructorParameters<Constructor extends TConstructor>(f: Constructor): TConstructorParameters<Constructor> {
-        throw 1
+    public ConstructorParameters<Constructor extends TConstructor<any[], TSchema>>(f: Constructor, options: SchemaOptions = {}): TConstructorParameters<Constructor> {
+        const additionalItems = false
+        const minItems = f.parameters.length
+        const maxItems = f.parameters.length
+        const schema = ((f.parameters.length > 0)
+            ? { ...options, [Kind]: 'ConstructorParameters', type: 'array', items: f.parameters, additionalItems, minItems, maxItems }
+            : { ...options, [Kind]: 'ConstructorParameters', type: 'array', minItems, maxItems }) as any
+        return this.Create(schema)
     }
 
     /** `Standard` Creates an enum type from a TypeScript enum */
@@ -551,8 +575,8 @@ export class TypeBuilder {
     }
 
     /** `Extended` Creates a function type */
-    public Function<T extends TSchema[], U extends TSchema>(args: [...T], returns: U, options: SchemaOptions = {}): TFunction<T, U> {
-        return this.Create({ ...options, [Kind]: 'Function', type: 'function', arguments: args, returns })
+    public Function<T extends readonly TSchema[], U extends TSchema>(parameters: [...T], returns: U, options: SchemaOptions = {}): TFunction<T, U> {
+        return this.Create({ ...options, [Kind]: 'Function', type: 'function', parameters, returns })
     }
 
     /** `Standard` Creates an integer type */
@@ -626,8 +650,14 @@ export class TypeBuilder {
     }
 
     /** `Extended` Creates a tuple type by extracting the given functions parameters */
-    public Parameters<Function extends TFunction<TSchema[], TSchema>>(f: Function): TParameters<Function> {
-        throw 1
+    public Parameters<Function extends TFunction<any[], TSchema>>(f: Function, options: SchemaOptions = {}): TParameters<Function> {
+        const additionalItems = false
+        const minItems = f.parameters.length
+        const maxItems = f.parameters.length
+        const schema = ((f.parameters.length > 0)
+            ? { ...options, [Kind]: 'Parameters', type: 'array', items: f.parameters, additionalItems, minItems, maxItems }
+            : { ...options, [Kind]: 'Parameters', type: 'array', minItems, maxItems }) as any
+        return this.Create(schema)
     }
 
     /** `Standard` Makes all properties in the given object type optional */
@@ -687,7 +717,7 @@ export class TypeBuilder {
 
     /** `Standard` References a type within a namespace. The referenced namespace must specify an `$id` */
     public Ref<T extends TNamespace<TDefinitions>, K extends keyof T['$defs']>(namespace: T, key: K): TRef<T['$defs'][K]>
-
+    
     /** `Standard` References type. The referenced type must specify an `$id` */
     public Ref<T extends TSchema>(schema: T): TRef<T>
 
@@ -729,6 +759,11 @@ export class TypeBuilder {
             }
         }
         return this.Create(schema)
+    }
+
+    /** `Experimental` Creates the return type from this function. */
+    public ReturnType<Function extends TFunction<TSchema[], TSchema>>(f: Function): TReturnType<Function> {
+        return clone(f.returns)
     }
 
     /** `Standard` Creates a string type */
