@@ -336,6 +336,17 @@ export interface TRecord<K extends TRecordKey, T extends TSchema> extends TSchem
 }
 
 // --------------------------------------------------------------------------
+// TRec
+// --------------------------------------------------------------------------
+
+export interface TRec<T extends TSchema> extends TSchema {
+    $static: T['$static']
+    [Kind]: 'TRec'
+    $ref:   string,
+    $defs:  unknown
+}
+
+// --------------------------------------------------------------------------
 // TRef
 // --------------------------------------------------------------------------
 
@@ -653,10 +664,10 @@ export class TypeBuilder {
     }
 
     /** `Experimental` Creates a recursive type */
-    public Rec<T extends TSchema>(callback: (self: TAny) => T, options: SchemaOptions = {}): T {
+    public Rec<T extends TSchema>(callback: (self: TAny) => T, options: SchemaOptions = {}): TRec<T> {
         const $id = options.$id || ''
         const self = callback({ $ref: `${$id}#/$defs/self` } as any)
-        return this.Create({ ...options, $ref: `${$id}#/$defs/self`, $defs: { self } } as any)
+        return this.Create({ ...options, [Kind]: 'Rec', $ref: `${$id}#/$defs/self`, $defs: { self } } as any)
     }
 
     /** `Standard` References a type within a namespace. The referenced namespace must specify an `$id` */
