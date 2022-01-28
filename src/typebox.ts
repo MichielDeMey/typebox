@@ -211,7 +211,7 @@ export interface TDefinitions {
 }
 
 export interface TNamespace<T extends TDefinitions> extends TSchema {
-    $static: {[K in keyof T]: T[K] extends TSchema ? T[K]['$static'] : never }
+    $static: { [K in keyof T]: T[K] extends TSchema ? T[K]['$static'] : never }
     [Kind]: 'Namespace',
     $defs: T
 }
@@ -264,7 +264,7 @@ type StaticProperties<T extends TProperties> =
         { [K in StaticRequiredPropertyKeys<T>]: T[K]['$static'] }
     ) extends infer R ? {
         [K in keyof R]: R[K]
-    }: never
+    } : never
 
 export interface TProperties { [key: string]: TSchema }
 
@@ -273,7 +273,7 @@ export interface ObjectOptions extends SchemaOptions {
 }
 
 export interface TObject<T extends TProperties = TProperties> extends TSchema, ObjectOptions {
-    $static: StaticProperties<T> 
+    $static: StaticProperties<T>
     [Kind]: 'Object',
     type: 'object',
     properties: T,
@@ -325,7 +325,7 @@ export type StaticRecord<K extends TRecordKey, T extends TSchema> =
     K extends TString ? Record<string, T['$static']> :
     K extends TNumber ? Record<number, T['$static']> :
     K extends TKeyOf<TObject | TRef<TObject>> ? Record<K['$static'], T['$static']> :
-    K extends TUnion<TLiteral[]> ? K['$static'] extends string ? Record<K['$static'], T['$static']> : never : 
+    K extends TUnion<TLiteral[]> ? K['$static'] extends string ? Record<K['$static'], T['$static']> : never :
     never
 
 export type TRecordKey = TString | TNumber | TKeyOf<any> | TUnion<any>
@@ -344,8 +344,8 @@ export interface TRecord<K extends TRecordKey, T extends TSchema> extends TSchem
 export interface TRec<T extends TSchema> extends TSchema {
     $static: T['$static']
     [Kind]: 'TRec'
-    $ref:   string,
-    $defs:  unknown
+    $ref: string,
+    $defs: unknown
 }
 
 // --------------------------------------------------------------------------
@@ -405,7 +405,7 @@ export interface TString extends TSchema, StringOptions<string> {
 // --------------------------------------------------------------------------
 
 export interface TTuple<T extends TSchema[]> extends TSchema {
-    $static:  [...{ [K in keyof T]: T[K] extends TSchema ? T[K]['$static']: never }],
+    $static: [...{ [K in keyof T]: T[K] extends TSchema ? T[K]['$static'] : never }],
     [Kind]: 'Tuple',
     type: 'array',
     items?: T,
@@ -459,29 +459,6 @@ export interface TVoid extends TSchema {
 
 export type Static<T extends TSchema> = T['$static']
 
-// --------------------------------------------------------------------------
-// Utility
-// --------------------------------------------------------------------------
-
-function isObject(object: any): object is Record<string | symbol, any> {
-    return typeof object === 'object' && object !== null && !Array.isArray(object)
-}
-
-function isArray(object: any): object is any[] {
-    return typeof object === 'object' && object !== null && Array.isArray(object)
-}
-
-function clone(object: any): any {
-    if (isObject(object)) {
-        const result1 = Object.getOwnPropertySymbols(object).reduce<any>((acc, key) => ({ ...acc, [key]: clone(object[key]) }), {})
-        const result2 = Object.keys(object).reduce<any>((acc, key) => ({ ...acc, [key]: clone(object[key]) }), result1)
-        return result2
-    }
-    if (isArray(object)) {
-        return object.map((item: any) => clone(item))
-    }
-    return object
-}
 
 // --------------------------------------------------------------------------
 // TypeBuilder
@@ -489,7 +466,11 @@ function clone(object: any): any {
 
 export class TypeBuilder {
 
-    protected readonly schemas = new Map<string, TSchema>()
+    protected readonly schemas: Map<string, TSchema>
+
+    constructor() {
+        this.schemas = new Map<string, TSchema>()
+    }
 
     // ----------------------------------------------------------------------
     // Modifiers
@@ -604,7 +585,7 @@ export class TypeBuilder {
     /** Omits property keys from the given object type */
     public Omit<T extends TObject, Keys extends Array<keyof T['properties']>>(object: T, keys: [...Keys], options: SchemaOptions = {}): TOmit<T, Keys> {
         const source = this.Deref(object)
-        const schema = { ...clone(source), ...options }
+        const schema = { ...this.Clone(source), ...options }
         schema.required = schema.required ? schema.required.filter((key: string) => !keys.includes(key as any)) : undefined
         for (const key of Object.keys(schema.properties)) {
             if (keys.includes(key as any)) delete schema.properties[key]
@@ -615,7 +596,7 @@ export class TypeBuilder {
     /** Makes all properties in the given object type optional */
     public Partial<T extends TObject | TRef<TObject>>(object: T, options: ObjectOptions = {}): TPartial<T> {
         const source = this.Deref(object)
-        const schema = { ...clone(source) as T, ...options }
+        const schema = { ...this.Clone(source) as T, ...options }
         delete schema.required
         for (const key of Object.keys(schema.properties)) {
             const property = schema.properties[key]
@@ -633,7 +614,7 @@ export class TypeBuilder {
     /** Picks property keys from the given object type */
     public Pick<T extends TObject, Keys extends Array<keyof T['properties']>>(object: T, keys: [...Keys], options: SchemaOptions = {}): TPick<T, Keys> {
         const source = this.Deref(object)
-        const schema = { ...clone(source), ...options }
+        const schema = { ...this.Clone(source), ...options }
         schema.required = schema.required ? schema.required.filter((key: any) => keys.includes(key)) : undefined
         for (const key of Object.keys(schema.properties)) {
             if (!keys.includes(key as any)) delete schema.properties[key]
@@ -698,7 +679,7 @@ export class TypeBuilder {
     /** Makes all properties in the given object type required */
     public Required<T extends TObject | TRef<TObject>>(object: T, options: SchemaOptions = {}): TRequired<T> {
         const source = this.Deref(object)
-        const schema = { ...clone(source) as T, ...options }
+        const schema = { ...this.Clone(source) as T, ...options }
         schema.required = Object.keys(schema.properties)
         for (const key of Object.keys(schema.properties)) {
             const property = schema.properties[key]
@@ -752,6 +733,23 @@ export class TypeBuilder {
     /** Omits the `kind` and `modifier` properties from the underlying schema */
     public Strict<T extends TSchema>(schema: T, options: SchemaOptions = {}): T {
         return JSON.parse(JSON.stringify({ ...options, ...schema })) as T
+    }
+
+    /** Clones the given object */
+    protected Clone(object: any): any {
+        const isObject = (object: any): object is Record<string | symbol, any> => typeof object === 'object' && object !== null && !Array.isArray(object)
+        const isArray = (object: any): object is any[] => typeof object === 'object' && object !== null && Array.isArray(object)
+        if (isObject(object)) {
+            return Object.keys(object).reduce((acc, key) => ({
+                ...acc, [key]: this.Clone(object[key])
+            }), Object.getOwnPropertySymbols(object).reduce((acc, key) => ({
+                ...acc, [key]: this.Clone(object[key])
+            }), {}))
+        } else if (isArray(object)) {
+            return object.map((item: any) => this.Clone(item))
+        } else {
+            return object
+        }
     }
 
     /** Conditionally stores and schema if it contains an $id and returns  */

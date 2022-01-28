@@ -264,6 +264,7 @@ export interface TVoid extends TSchema {
 export declare type Static<T extends TSchema> = T['$static'];
 export declare class TypeBuilder {
     protected readonly schemas: Map<string, TSchema>;
+    constructor();
     /** Modifies an object property to be both readonly and optional */
     ReadonlyOptional<T extends TSchema>(item: T): TReadonlyOptional<T>;
     /** Modifies an object property to be readonly */
@@ -332,6 +333,8 @@ export declare class TypeBuilder {
     Void(options?: SchemaOptions): TVoid;
     /** Omits the `kind` and `modifier` properties from the underlying schema */
     Strict<T extends TSchema>(schema: T, options?: SchemaOptions): T;
+    /** Clones the given object */
+    protected Clone(object: any): any;
     /** Conditionally stores and schema if it contains an $id and returns  */
     protected Create<T extends TSchema>(schema: Omit<T, '$static'>): T;
     /** Conditionally dereferences a schema if RefKind. Otherwise return argument */
