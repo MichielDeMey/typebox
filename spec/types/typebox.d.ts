@@ -112,7 +112,7 @@ export interface TLiteral<T extends TLiteralValue = TLiteralValue> extends TSche
 export interface TDefinitions {
     [name: string]: TSchema;
 }
-export interface TNamespace<T extends TDefinitions> extends TSchema {
+export interface TNamespace<T extends TDefinitions = TDefinitions> extends TSchema {
     $static: {
         [K in keyof T]: T[K] extends TSchema ? T[K]['$static'] : never;
     };
@@ -245,7 +245,7 @@ export interface TUndefined extends TSchema {
     [Kind]: 'Undefined';
     type: 'undefined';
 }
-export interface TUnion<T extends TSchema[]> extends TSchema {
+export interface TUnion<T extends TSchema[] = TSchema[]> extends TSchema {
     $static: {
         [K in keyof T]: T[K] extends TSchema ? Static<T[K]> : never;
     }[number];

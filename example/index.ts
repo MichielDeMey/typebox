@@ -1,11 +1,17 @@
 import { Type, Static } from '@sinclair/typebox'
 
 const T = Type.Object({
-    A: Type.ReadonlyOptional(Type.Number()),
-    B: Type.Optional(Type.Number()),
-    C: Type.Readonly(Type.String()),
+    A: Type.Number(),
+    B: Type.Number(),
+    C: Type.Number(),
     D: Type.Number()
-})
+}, { $id: 'T' })
+
+const R1 = Type.Ref(T)
+
+const R2 = Type.Ref(R1)
+
+type R2 = Static<typeof R2>
 
 console.log(T)
 
