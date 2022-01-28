@@ -314,7 +314,7 @@ export declare class TypeBuilder {
     /** `Experimental` Creates a recursive type */
     Rec<T extends TSchema>(callback: (self: TAny) => T, options?: SchemaOptions): TRec<T>;
     /** References a type within a namespace. The referenced namespace must specify an `$id` */
-    Ref<T extends TNamespace<TDefinitions>, K extends keyof T['$defs']>(namespace: T, key: K): TRef<T['$defs'][K]>;
+    Ref<T extends TNamespace, K extends keyof T['$defs']>(namespace: T, key: K): TRef<T['$defs'][K]>;
     /** References type. The referenced type must specify an `$id` */
     Ref<T extends TSchema>(schema: T): TRef<T>;
     /** Creates a string type from a regular expression */

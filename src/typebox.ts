@@ -653,8 +653,8 @@ export class TypeBuilder {
     }
 
     /** References a type within a namespace. The referenced namespace must specify an `$id` */
-    public Ref<T extends TNamespace<TDefinitions>, K extends keyof T['$defs']>(namespace: T, key: K): TRef<T['$defs'][K]>
-
+    public Ref<T extends TNamespace, K extends keyof T['$defs']>(namespace: T, key: K): TRef<T['$defs'][K]>
+    
     /** References type. The referenced type must specify an `$id` */
     public Ref<T extends TSchema>(schema: T): TRef<T>
 
