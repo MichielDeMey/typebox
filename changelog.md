@@ -2,13 +2,29 @@
 
 Updates:
 
-- Breaking: Change on `Kind` and `Modifier` properties. These are now expressed as symbol properties on each underlying schema, with the `kind` value now expressed as a string value. This change was done to ensure TypeBox produces immediately consumable schemas in AJV version 7+.
+- Breaking: Change to `kind` and `modifier` properties. These are now expressed as symbol properties on each schema with the `kind` value now expressed as a string value. This change was carried out to ensure TypeBox produces immediately consumable schemas in AJV version 7+.
 - Breaking: The `StaticObject`, `StaticArray`, `StaticUnion`, etc utility types have been removed. Static inference is now implemented directly on each type. This work was carried out to simplify inference and further prepare for recursive type inference.
+- Change: `TNamespace` is now a subtype of `TSchema`.
 - Change: `CustomOptions` renamed to `SchemaOptions`
 - Added: `SchemaOptions` now includes optional property `$schema`
-- Added: `Type.Rec()` now returns a `TRec<T>` type. 
+- Added: `Type.Rec()` now returns a specific `TRec<T>` type. 
+- General refactoring to assist with code readability.
 
+#### Kind and Modifier Updates
 
+TypeBox exports a `Kind` and `Modifier` symbols to allow introspection into these properties. Note that the specific symbols relating to kinds have been removed in favor of these string representations.
+
+```typescript
+import { Type, Kind, Modifier } from '@sinclair/typebox'
+
+const T = Type.Object({
+    x: Type.Optional(Type.String())
+})
+
+const S1 = T[Kind]                  // "Object"
+const S2 = T.properties.x[Kind]     // "String"
+const S3 = T.properties.x[Modifier] // "Optional"
+```
 
 ## [0.23.3](https://www.npmjs.com/package/@sinclair/typebox/v/0.23.3)
 

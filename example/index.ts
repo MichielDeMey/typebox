@@ -8,9 +8,6 @@ const T = Type.Object({
 
 console.log(T)
 
-console.log(Object.getOwnPropertySymbols(T))
-console.log(Object.keys(T))
-type T = Static<typeof T>
 
 
 
