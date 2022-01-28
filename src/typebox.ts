@@ -4,7 +4,7 @@ TypeBox: JSON Schema Type Builder with Static Type Resolution for TypeScript
 
 The MIT License (MIT)
 
-Copyright (c) 2021 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
+Copyright (c) 2022 Haydn Paterson (sinclair) <haydn.developer@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -654,7 +654,7 @@ export class TypeBuilder {
 
     /** References a type within a namespace. The referenced namespace must specify an `$id` */
     public Ref<T extends TNamespace, K extends keyof T['$defs']>(namespace: T, key: K): TRef<T['$defs'][K]>
-    
+
     /** References type. The referenced type must specify an `$id` */
     public Ref<T extends TSchema>(schema: T): TRef<T>
 
