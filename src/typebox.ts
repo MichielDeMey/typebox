@@ -637,7 +637,7 @@ export class TypeBuilder {
                 case 'Union': return `^${key.anyOf.map((literal: any) => literal.const as TLiteralValue).join('|')}$`
                 case 'KeyOf': return `^${key.enum.join('|')}$`
                 case 'Number': return '^(0|[1-9][0-9]*)$'
-                case 'String': return '^.*$'
+                case 'String': return key.pattern ? key.pattern : '^.*$'
                 case 'RegEx':  return key.pattern
                 default: throw Error('Invalid Record Key')
             }
