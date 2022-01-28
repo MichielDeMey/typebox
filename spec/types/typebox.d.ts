@@ -11,6 +11,7 @@ export declare type TReadonlyOptional<T extends TSchema> = T & {
     [Modifier]: 'ReadonlyOptional';
 };
 export interface SchemaOptions {
+    $schema?: string;
     $id?: string;
     title?: string;
     description?: string;
@@ -118,11 +119,6 @@ export interface TNamespace<T extends TDefinitions> extends TSchema {
     [Kind]: 'Namespace';
     $defs: T;
 }
-export interface TNever extends TSchema {
-    $static: never;
-    [Kind]: 'Never';
-    not: {};
-}
 export interface TNull extends TSchema {
     $static: null;
     [Kind]: 'Null';
@@ -201,6 +197,12 @@ export interface TRecord<K extends TRecordKey, T extends TSchema> extends TSchem
         [pattern: string]: T;
     };
 }
+export interface TRec<T extends TSchema> extends TSchema {
+    $static: T['$static'];
+    [Kind]: 'TRec';
+    $ref: string;
+    $defs: unknown;
+}
 export interface TRef<T extends TSchema> extends TSchema {
     $static: T['$static'];
     [Kind]: 'Ref';
@@ -262,75 +264,73 @@ export interface TVoid extends TSchema {
 export declare type Static<T extends TSchema> = T['$static'];
 export declare class TypeBuilder {
     protected readonly schemas: Map<string, TSchema>;
-    /** `Standard` Modifies an object property to be both readonly and optional */
+    /** Modifies an object property to be both readonly and optional */
     ReadonlyOptional<T extends TSchema>(item: T): TReadonlyOptional<T>;
-    /** `Standard` Modifies an object property to be readonly */
+    /** Modifies an object property to be readonly */
     Readonly<T extends TSchema>(item: T): TReadonly<T>;
-    /** `Standard` Modifies an object property to be optional */
+    /** Modifies an object property to be optional */
     Optional<T extends TSchema>(item: T): TOptional<T>;
-    /** `Standard` Creates an any type */
+    /** Creates an any type */
     Any(options?: SchemaOptions): TAny;
-    /** `Standard` Creates an array type */
+    /** Creates an array type */
     Array<T extends TSchema>(items: T, options?: ArrayOptions): TArray<T>;
-    /** `Standard` Creates a boolean type */
+    /** Creates a boolean type */
     Boolean(options?: SchemaOptions): TBoolean;
     /** `Extended` Creates a constructor type */
     Constructor<T extends TSchema[], U extends TSchema>(parameters: [...T], returns: U, options?: SchemaOptions): TConstructor<T, U>;
-    /** `Standard` Creates an enum type from a TypeScript enum */
+    /** Creates an enum type from a TypeScript enum */
     Enum<T extends Record<string, string | number>>(item: T, options?: SchemaOptions): TEnum<T>;
     /** `Extended` Creates a function type */
     Function<T extends readonly TSchema[], U extends TSchema>(parameters: [...T], returns: U, options?: SchemaOptions): TFunction<T, U>;
-    /** `Standard` Creates an integer type */
+    /** Creates an integer type */
     Integer(options?: IntegerOptions): TInteger;
-    /** `Standard` Creates an intersect type. */
+    /** Creates an intersect type. */
     Intersect<T extends TSchema[]>(items: [...T], options?: IntersectOptions): TIntersect<T>;
-    /** `Standard` Creates a keyof type from the given object */
+    /** Creates a keyof type from the given object */
     KeyOf<T extends TObject | TRef<TObject>>(object: T, options?: SchemaOptions): TKeyOf<T>;
-    /** `Standard` Creates a literal type. Supports string, number and boolean values only */
+    /** Creates a literal type. Supports string, number and boolean values only */
     Literal<T extends TLiteralValue>(value: T, options?: SchemaOptions): TLiteral<T>;
-    /** `Standard` Creates a namespace for a set of related types */
+    /** Creates a namespace for a set of related types */
     Namespace<T extends TDefinitions>($defs: T, options?: SchemaOptions): TNamespace<T>;
-    /** `Experimental` Creates a never type */
-    Never(options?: SchemaOptions): TNever;
-    /** `Standard` Creates a null type */
+    /** Creates a null type */
     Null(options?: SchemaOptions): TNull;
-    /** `Standard` Creates a number type */
+    /** Creates a number type */
     Number(options?: NumberOptions): TNumber;
-    /** `Standard` Creates an object type with the given properties */
+    /** Creates an object type with the given properties */
     Object<T extends TProperties>(properties: T, options?: ObjectOptions): TObject<T>;
-    /** `Standard` Omits property keys from the given object type */
+    /** Omits property keys from the given object type */
     Omit<T extends TObject, Keys extends Array<keyof T['properties']>>(object: T, keys: [...Keys], options?: SchemaOptions): TOmit<T, Keys>;
-    /** `Standard` Makes all properties in the given object type optional */
+    /** Makes all properties in the given object type optional */
     Partial<T extends TObject | TRef<TObject>>(object: T, options?: ObjectOptions): TPartial<T>;
-    /** `Standard` Picks property keys from the given object type */
+    /** Picks property keys from the given object type */
     Pick<T extends TObject, Keys extends Array<keyof T['properties']>>(object: T, keys: [...Keys], options?: SchemaOptions): TPick<T, Keys>;
     /** `Extended` Creates a promise type */
     Promise<T extends TSchema>(item: T, options?: SchemaOptions): TPromise<T>;
-    /** `Standard` Creates a record type */
+    /** Creates a record type */
     Record<K extends TRecordKey, T extends TSchema>(key: K, value: T, options?: ObjectOptions): TRecord<K, T>;
     /** `Experimental` Creates a recursive type */
-    Rec<T extends TSchema>(callback: (self: TAny) => T, options?: SchemaOptions): T;
-    /** `Standard` References a type within a namespace. The referenced namespace must specify an `$id` */
+    Rec<T extends TSchema>(callback: (self: TAny) => T, options?: SchemaOptions): TRec<T>;
+    /** References a type within a namespace. The referenced namespace must specify an `$id` */
     Ref<T extends TNamespace<TDefinitions>, K extends keyof T['$defs']>(namespace: T, key: K): TRef<T['$defs'][K]>;
-    /** `Standard` References type. The referenced type must specify an `$id` */
+    /** References type. The referenced type must specify an `$id` */
     Ref<T extends TSchema>(schema: T): TRef<T>;
-    /** `Standard` Creates a string type from a regular expression */
+    /** Creates a string type from a regular expression */
     RegEx(regex: RegExp, options?: SchemaOptions): TString;
-    /** `Standard` Makes all properties in the given object type required */
+    /** Makes all properties in the given object type required */
     Required<T extends TObject | TRef<TObject>>(object: T, options?: SchemaOptions): TRequired<T>;
-    /** `Standard` Creates a string type */
+    /** Creates a string type */
     String<TCustomFormatOption extends string>(options?: StringOptions<StringFormatOption | TCustomFormatOption>): TString;
-    /** `Standard` Creates a type type */
+    /** Creates a type type */
     Tuple<T extends TSchema[]>(items: [...T], options?: SchemaOptions): TTuple<T>;
     /** `Extended` Creates a undefined type */
     Undefined(options?: SchemaOptions): TUndefined;
-    /** `Standard` Creates a union type */
+    /** Creates a union type */
     Union<T extends TSchema[]>(items: [...T], options?: SchemaOptions): TUnion<T>;
-    /** `Standard` Creates an unknown type */
+    /** Creates an unknown type */
     Unknown(options?: SchemaOptions): TUnknown;
     /** `Extended` Creates a void type */
     Void(options?: SchemaOptions): TVoid;
-    /** `Standard` Omits the `kind` and `modifier` properties from the underlying schema */
+    /** Omits the `kind` and `modifier` properties from the underlying schema */
     Strict<T extends TSchema>(schema: T, options?: SchemaOptions): T;
     /** Conditionally stores and schema if it contains an $id and returns  */
     protected Create<T extends TSchema>(schema: Omit<T, '$static'>): T;

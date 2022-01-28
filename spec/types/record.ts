@@ -51,7 +51,6 @@ import { Type } from './typebox'
     )
 }
 {
-    // type K = keyof { A: number, B: number, C: number }
     const K = Type.KeyOf(
         Type.Object({
             A: Type.Number(),

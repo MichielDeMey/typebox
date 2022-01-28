@@ -1,3 +1,12 @@
+## [0.23.3](https://www.npmjs.com/package/@sinclair/typebox/v/0.24.0)
+
+Updates:
+
+- Breaking: Change on `Kind` and `Modifier` properties. These are now expressed as symbol properties on each underlying schema, with the specific `kind` property value symbols now expressed as strings. This change was done to ensure TypeBox produces immediately consumable schemas in AJV version 7+.
+- Breaking: The `StaticObject`, `StaticArray`, `StaticUnion`, etc utility types have been removed. Static inference is now implemented directly on each type. This work was carried out to simplify inference and further prepare for recursive type inference.
+- Added: `Type.Rec()` now returns a `TRec<T>` type.  
+
+
 ## [0.23.3](https://www.npmjs.com/package/@sinclair/typebox/v/0.23.3)
 
 Updates:

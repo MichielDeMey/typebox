@@ -598,19 +598,19 @@ In addition to JSON schema types, TypeBox provides several extended types that a
 
 ### Strict
 
-TypeBox schemas contain the properties `kind` and `modifier`. These properties are provided to enable runtime type reflection on schemas, as well as helping TypeBox apply the appropriate static type inference rules. These properties are not strictly valid JSON schema so in some cases it may be desirable to omit them. TypeBox provides a `Type.Strict()` function that will omit these properties if necessary.
+TypeBox schemas contain the symbol properties `Kind` and `Modifier`. These properties are required to help TypeBox apply appropriate schema mapping rules as well as enabling runtime type introspection. These properties are not strictly valid JSON schema so in some cases it may be desirable to omit them. TypeBox provides the `Type.Strict()` function that will omit these properties if necessary.
 
 ```typescript
-const T = Type.Object({                       // const T = {
-    name: Type.Optional(Type.String())        //   kind: Symbol(ObjectKind),
-})                                            //   type: 'object',
-                                              //   properties: {
+const T = Type.Object({                       // {
+    name: Type.Optional(Type.String())        //   type: 'object',
+})                                            //   properties: {
                                               //     name: {
-                                              //       kind: Symbol(StringKind),
                                               //       type: 'string',
-                                              //       modifier: Symbol(OptionalModifier)
+                                              //       [Symbol(Modifier)]: 'Optional',
+                                              //       [Symbol(Kind)]: 'String'
                                               //     }
-                                              //   }
+                                              //   },
+                                              //   [Symbol(Kind)]: 'Object'
                                               // }
 
 const U = Type.Strict(T)                      // const U = {
@@ -665,8 +665,7 @@ const ajv = addFormats(new Ajv({}), [
     'json-pointer', 
     'relative-json-pointer', 
     'regex'
-]).addKeyword('kind')
-  .addKeyword('modifier')
+])
 
 //--------------------------------------------------------------------------------------------
 //
