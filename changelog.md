@@ -12,7 +12,7 @@ Updates:
 
 #### Kind and Modifier Updates
 
-TypeBox exports a `Kind` and `Modifier` symbols to allow introspection into these properties. Note that the specific symbols relating to kinds have been removed in favor of these string representations.
+TypeBox exports new `Kind` and `Modifier` symbols which can be used as keys to introspect the kind and modifier metadata on schemas. Note that the specific symbols relating to kinds and modifiers have been removed in favor of simple string representations.
 
 ```typescript
 import { Type, Kind, Modifier } from '@sinclair/typebox'
