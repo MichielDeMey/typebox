@@ -166,6 +166,7 @@ export interface TInteger extends TSchema, IntegerOptions {
 // --------------------------------------------------------------------------
 
 type StaticIntersectEvaluate<T extends readonly TSchema[]> = { [K in keyof T]: T[K] extends TSchema ? T[K]['$static'] : never }
+
 type StaticIntersectReduce<I extends unknown, T extends readonly any[]> = T extends [infer A, ...infer B] ? StaticIntersectReduce<I & A, B> : I
 
 export interface IntersectOptions extends SchemaOptions {
@@ -248,8 +249,11 @@ export interface TNumber extends TSchema, NumberOptions {
 // --------------------------------------------------------------------------
 
 type StaticReadonlyOptionalPropertyKeys<T extends TProperties> = { [K in keyof T]: T[K] extends TReadonlyOptional<TSchema> ? K : never }[keyof T]
+
 type StaticReadonlyPropertyKeys<T extends TProperties> = { [K in keyof T]: T[K] extends TReadonly<TSchema> ? K : never }[keyof T]
+
 type StaticOptionalPropertyKeys<T extends TProperties> = { [K in keyof T]: T[K] extends TOptional<TSchema> ? K : never }[keyof T]
+
 type StaticRequiredPropertyKeys<T extends TProperties> = keyof Omit<T, StaticReadonlyOptionalPropertyKeys<T> | StaticReadonlyPropertyKeys<T> | StaticOptionalPropertyKeys<T>>
 
 type StaticProperties<T extends TProperties> =

@@ -6,9 +6,10 @@ Updates:
 - Breaking: The `StaticObject`, `StaticArray`, `StaticUnion`, etc utility types have been removed. Static inference is now implemented directly on each type. This work was carried out to simplify inference and further prepare for recursive type inference.
 - Change: `TNamespace` is now a subtype of `TSchema`.
 - Change: `CustomOptions` renamed to `SchemaOptions`
-- Added: `SchemaOptions` now includes optional property `$schema`
+- Added: `SchemaOptions` now includes optional property `$schema`.
 - Added: `Type.Rec()` now returns a specific `TRec<T>` type. 
-- General refactoring to assist with code readability.
+- General: Simplification on `Type.Enum()` signature.
+- General: Refactoring to improve code readability.
 
 #### Kind and Modifier Updates
 
