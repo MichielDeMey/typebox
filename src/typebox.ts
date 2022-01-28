@@ -257,10 +257,14 @@ type StaticOptionalPropertyKeys<T extends TProperties> = { [K in keyof T]: T[K] 
 type StaticRequiredPropertyKeys<T extends TProperties> = keyof Omit<T, StaticReadonlyOptionalPropertyKeys<T> | StaticReadonlyPropertyKeys<T> | StaticOptionalPropertyKeys<T>>
 
 type StaticProperties<T extends TProperties> =
-    { readonly [K in StaticReadonlyOptionalPropertyKeys<T>]?: T[K]['$static'] } &
-    { readonly [K in StaticReadonlyPropertyKeys<T>]: T[K]['$static'] } &
-    { [K in StaticOptionalPropertyKeys<T>]?: T[K]['$static'] } &
-    { [K in StaticRequiredPropertyKeys<T>]: T[K]['$static'] }
+    (
+        { readonly [K in StaticReadonlyOptionalPropertyKeys<T>]?: T[K]['$static'] } &
+        { readonly [K in StaticReadonlyPropertyKeys<T>]: T[K]['$static'] } &
+        { [K in StaticOptionalPropertyKeys<T>]?: T[K]['$static'] } &
+        { [K in StaticRequiredPropertyKeys<T>]: T[K]['$static'] }
+    ) extends infer R ? {
+        [K in keyof R]: R[K]
+    }: never
 
 export interface TProperties { [key: string]: TSchema }
 
@@ -269,7 +273,7 @@ export interface ObjectOptions extends SchemaOptions {
 }
 
 export interface TObject<T extends TProperties = TProperties> extends TSchema, ObjectOptions {
-    $static: StaticProperties<T> extends infer R ? { [K in keyof R]: R[K] } : never
+    $static: StaticProperties<T> 
     [Kind]: 'Object',
     type: 'object',
     properties: T,

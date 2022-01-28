@@ -1,12 +1,16 @@
 import { Type, Static } from '@sinclair/typebox'
 
 const T = Type.Object({
-    A: Type.Union([]),
-    B: Type.Intersect([]),
-    C: Type.Readonly(Type.String())
+    A: Type.ReadonlyOptional(Type.Number()),
+    B: Type.Optional(Type.Number()),
+    C: Type.Readonly(Type.String()),
+    D: Type.Number()
 })
 
 console.log(T)
+
+type T = Static<typeof T>
+
 
 
 
