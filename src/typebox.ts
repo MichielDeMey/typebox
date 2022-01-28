@@ -321,14 +321,15 @@ export interface TPromise<T extends TSchema> extends TSchema {
 // TRecord
 // --------------------------------------------------------------------------
 
+export type TRecordKey = TString | TNumber | TRegEx | TKeyOf<any> | TUnion<any>
+
 export type StaticRecord<K extends TRecordKey, T extends TSchema> =
     K extends TString ? Record<string, T['$static']> :
     K extends TNumber ? Record<number, T['$static']> :
+    K extends TRegEx  ? Record<string, T['$static']> :
     K extends TKeyOf<TObject | TRef<TObject>> ? Record<K['$static'], T['$static']> :
     K extends TUnion<TLiteral[]> ? K['$static'] extends string ? Record<K['$static'], T['$static']> : never :
     never
-
-export type TRecordKey = TString | TNumber | TKeyOf<any> | TUnion<any>
 
 export interface TRecord<K extends TRecordKey, T extends TSchema> extends TSchema {
     $static: StaticRecord<K, T>,
@@ -365,6 +366,8 @@ export interface TRef<T extends TSchema> extends TSchema {
 export interface TRegEx extends TSchema {
     $static: string
     [Kind]: 'RegEx'
+    type: 'string'
+    pattern: string
 }
 
 // --------------------------------------------------------------------------
@@ -634,7 +637,8 @@ export class TypeBuilder {
                 case 'Union': return `^${key.anyOf.map((literal: any) => literal.const as TLiteralValue).join('|')}$`
                 case 'KeyOf': return `^${key.enum.join('|')}$`
                 case 'Number': return '^(0|[1-9][0-9]*)$'
-                case 'String': return key.pattern ? key.pattern : '^.*$'
+                case 'String': return '^.*$'
+                case 'RegEx':  return key.pattern
                 default: throw Error('Invalid Record Key')
             }
         })()
@@ -672,8 +676,8 @@ export class TypeBuilder {
     }
 
     /** Creates a string type from a regular expression */
-    public RegEx(regex: RegExp, options: SchemaOptions = {}): TString {
-        return this.String({ ...options, pattern: regex.source })
+    public RegEx(regex: RegExp, options: SchemaOptions = {}): TRegEx {
+        return this.Create({ ...options, [Kind]: 'RegEx', type: 'string', pattern: regex.source })
     }
 
     /** Makes all properties in the given object type required */

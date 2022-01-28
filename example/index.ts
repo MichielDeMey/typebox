@@ -9,7 +9,6 @@ const T = Type.Object({
 
 const R1 = Type.Ref(T)
 
-const R2 = Type.Ref(R1)
 
 type R2 = Static<typeof R2>
 

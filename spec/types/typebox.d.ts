@@ -187,8 +187,8 @@ export interface TPromise<T extends TSchema> extends TSchema {
     type: 'promise';
     item: TSchema;
 }
-export declare type StaticRecord<K extends TRecordKey, T extends TSchema> = K extends TString ? Record<string, T['$static']> : K extends TNumber ? Record<number, T['$static']> : K extends TKeyOf<TObject | TRef<TObject>> ? Record<K['$static'], T['$static']> : K extends TUnion<TLiteral[]> ? K['$static'] extends string ? Record<K['$static'], T['$static']> : never : never;
-export declare type TRecordKey = TString | TNumber | TKeyOf<any> | TUnion<any>;
+export declare type TRecordKey = TString | TNumber | TRegEx | TKeyOf<any> | TUnion<any>;
+export declare type StaticRecord<K extends TRecordKey, T extends TSchema> = K extends TString ? Record<string, T['$static']> : K extends TNumber ? Record<number, T['$static']> : K extends TRegEx ? Record<string, T['$static']> : K extends TKeyOf<TObject | TRef<TObject>> ? Record<K['$static'], T['$static']> : K extends TUnion<TLiteral[]> ? K['$static'] extends string ? Record<K['$static'], T['$static']> : never : never;
 export interface TRecord<K extends TRecordKey, T extends TSchema> extends TSchema {
     $static: StaticRecord<K, T>;
     [Kind]: 'Record';
@@ -211,6 +211,8 @@ export interface TRef<T extends TSchema> extends TSchema {
 export interface TRegEx extends TSchema {
     $static: string;
     [Kind]: 'RegEx';
+    type: 'string';
+    pattern: string;
 }
 export interface TRequired<T extends TObject | TRef<TObject>> extends TObject {
     $static: Required<T['$static']>;
@@ -316,7 +318,7 @@ export declare class TypeBuilder {
     /** References type. The referenced type must specify an `$id` */
     Ref<T extends TSchema>(schema: T): TRef<T>;
     /** Creates a string type from a regular expression */
-    RegEx(regex: RegExp, options?: SchemaOptions): TString;
+    RegEx(regex: RegExp, options?: SchemaOptions): TRegEx;
     /** Makes all properties in the given object type required */
     Required<T extends TObject | TRef<TObject>>(object: T, options?: SchemaOptions): TRequired<T>;
     /** Creates a string type */
